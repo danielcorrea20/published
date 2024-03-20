@@ -41,5 +41,9 @@
     <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.0" />
   </ItemGroup>
+  <Target Name="pipelinePreDeployCopyAllFilesToOneFolder" AfterTargets="Build">
+    <!-- Coloca aquí las acciones que deseas ejecutar antes del despliegue -->
+  </Target>
+
 
 </Project>
