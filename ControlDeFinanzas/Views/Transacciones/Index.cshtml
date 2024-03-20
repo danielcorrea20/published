@@ -1,0 +1,16 @@
+﻿@model ReporteTransaccionesDetalladas
+@{
+    ViewData["Title"] = "Reporte Diaio";
+}
+
+@*Para refactorizar creo una vista parcial que usara en varias vistas en este caso es _reporteTransaccionesDetalladas*@
+@*De esta manera el submenu solo me sle en transacciones*@
+<partial name="_Submenu" Model="SubmenuTransacciones.Diario" />
+
+<div class="mb-3">
+    <a asp-action="Crear" class="btn btn-primary">Crear una nueva transacción</a>
+</div>
+
+<partial name="_ReporteTransaccionesDetalladas" model="Model" />
+
+

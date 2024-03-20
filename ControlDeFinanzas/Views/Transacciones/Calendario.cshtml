@@ -1,0 +1,125 @@
+﻿@{
+    ViewData["Title"] = "Reporte Calendario";
+}
+
+<partial name="_Submenu" model="SubmenuTransacciones.Calendario" />
+
+<div id="calendario"></div>
+
+@*Uso la clase modal fade para crear los modales. En el header coloco un titulo y un boton X. En el cuerpo coloco una tabla con la fecha, los ingrsos y los gastos y en el footer un botón para cerrar*@
+@*COLOCO TODA LA DATA CON JAVASCRIPT MAS ABAJO*@
+<div class="modal fade" id="modalTransacciones" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Transacciones del día</h5>
+                @*El boton de la X*@
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th id="modalTablaFecha" colspan="2"></th>
+                            <th id="modalTablaIngresos" class="activo"></th>
+                            <th id="modalTablaGastos" class="pasivo"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalTablaCuerpo">
+                    </tbody>
+
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+
+    <script src="~/lib/fullcalendar/main.min.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const calendarioEl = document.getElementById('calendario');
+            const calendario = new FullCalendar.Calendar(calendarioEl, {
+                dayMaxEventRows: 3,
+                initialView: 'dayGridMonth',
+                events: '/transacciones/ObtenerTransaccionesCalendario',
+                dateClick: async function(info) {
+
+                    await buscarTransaccionesPorFecha(info.dateStr);
+                }
+            });
+
+            calendario.render();
+
+        });
+
+        async function buscarTransaccionesPorFecha(fecha) {
+            const response = await fetch(`/transacciones/ObtenerTransaccionesPorFecha?fecha=${fecha}`, {
+
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+
+            });
+
+            const json = await response.json();
+
+
+
+            let ingresos = 0;
+            let gastos = 0;
+            const tipoOperacionesIngresos = 1;
+
+            //formateo los números como dinero en este caso en dollares
+            const formateador = new Intl.NumberFormat('en-US', {
+                //moneda
+                style: 'currency',
+                //dollart americano
+                currency: 'USD'
+            });
+
+            //hago una proyección
+            const filas = json.map(transacciones => {
+                //calculo los ingresos y gastos del día
+                if (transacciones.tipoOperacionId === tipoOperacionesIngresos) {
+                    ingresos += transacciones.monto;
+                } else {
+                    gastos += transacciones.monto;
+                }
+                //relleno las celdas en el liena 102 si el tipooperación es un ingreso entonces es activo sino pasivo formateo el monto al estilo dollart
+                return `<tr>
+                            <td>${transacciones.categoria}</td>
+                            <td>${transacciones.cuenta}</td>
+                            <td align="right" colspan="2"
+                            class=${transacciones.tipoOperacionId === tipoOperacionesIngresos ? 'activo' : 'pasivo'}>
+                            ${formateador.format(transacciones.monto)}</td>
+                        </tr>`;
+
+            });
+            //sustituyo los valores que puese en las celdas por el valor del json uso los id para seleccionar la celda
+
+            $("#modalTablaCuerpo").html(filas);
+            $("#modalTablaIngresos").html(formateador.format(ingresos));
+            $("#modalTablaGastos").html(formateador.format(gastos));
+            $("#modalTablaFecha").html(fecha);
+
+            //Evento click, al hcer click salta el modal
+            const modalTransacciones = new bootstrap.Modal(document.getElementById('modalTransacciones'));
+
+            modalTransacciones.show();
+
+        }
+    </script>
+}
+
+

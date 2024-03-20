@@ -1,0 +1,25 @@
+﻿@model TipoCuenta
+@{
+    ViewData["title"] = "Crear tipo cuenta";
+}
+
+<h1>Crear Tipo de Cuenta</h1>
+<h5>El tipo de cuenta se refiere a como podemos agrupar cuentas. Ejemplo: Préstamos, tarjetas de crédito, etc.</h5>
+@*muestro el texto de error de las vadilaciones. Solo los del modelo*@
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Crear">
+    @*mb-3 es una caracteristica de .net core que significa margin botton espacio de 3*@
+    <div class="mb-3">
+        @*Uso ASP-FOR toma el tome del campo y lo pone en el label. De este modo no se borra el txt q ponga el usuario en el label del formulario*@
+        <label asp-for="Nombre" class="form-label"></label>
+        <input type="text" asp-for="Nombre" class="form-control" />
+        @*Con el span colocoamos el txt del error en la vadilación debajo de su campo*@
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar</button>
+    <a class="btn btn-secundary" asp-action="Index">Cancelar</a>
+</form>
+@*tomo la libreria jquery*@
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

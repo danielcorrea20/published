@@ -1,0 +1,8 @@
+﻿@model ReporteTransaccionesDetalladas
+@{
+    ViewData["title"] = "Movimiento Cuenta";
+}
+
+<h1>Movimiento @ViewBag.Cuenta</h1>
+@*Para refactorizar creo una vista parcial que usara en varias vistas en este caso es _reporteTransaccionesDetalladas*@
+<partial name="_ReporteTransaccionesDetalladas" model="Model" />
